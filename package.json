@@ -50,6 +50,7 @@
   },
   "private": true,
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.28.5",
     "@babel/preset-env": "^7.28.6",
     "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^13.3.3",
