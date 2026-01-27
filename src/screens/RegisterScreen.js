@@ -25,7 +25,12 @@ export default function RegisterScreen({ navigation }) {
 
   const handleRegister = async () => {
     if (!name || !email || !password || !age || !weight || !height) {
-      Alert.alert('Erro', 'Preencha todos os campos');
+      Alert.alert('Erro', 'Preencha todos os campos para continuar');
+      return;
+    }
+
+    if (parseInt(age) <= 0 || parseFloat(weight) <= 0 || parseFloat(height) <= 0) {
+      Alert.alert('Erro', 'Idade, peso e altura devem ser maiores que zero');
       return;
     }
 
@@ -44,9 +49,11 @@ export default function RegisterScreen({ navigation }) {
     setLoading(false);
 
     if (result.success) {
-      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!', [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
+      Alert.alert(
+        'Sucesso! 🎉', 
+        'Cadastro realizado com sucesso! Agora faça login com seu email e senha.', 
+        [{ text: 'Fazer Login', onPress: () => navigation.goBack() }]
+      );
     } else {
       Alert.alert('Erro', result.message);
     }

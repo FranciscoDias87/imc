@@ -82,6 +82,12 @@ export default function LoginScreen({ navigation }) {
                 Não tem conta? Cadastre-se
               </Text>
             </TouchableOpacity>
+
+            <View style={styles.infoBox}>
+              <Text style={styles.infoText}>
+                ℹ️ Primeira vez? Clique em "Cadastre-se" acima para criar sua conta!
+              </Text>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -155,5 +161,18 @@ const styles = StyleSheet.create({
   linkText: {
     color: '#3498db',
     fontSize: 16,
+  },
+  infoBox: {
+    backgroundColor: '#e3f2fd',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 30,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2196f3',
+  },
+  infoText: {
+    color: '#1565c0',
+    fontSize: 14,
+    lineHeight: 20,
   },
 });

@@ -74,8 +74,9 @@ export default function App() {
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
           </>
-        ) : null}
-        <Stack.Screen name="Main" component={MainTabs} />
+        ) : (
+          <Stack.Screen name="Main" component={MainTabs} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
