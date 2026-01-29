@@ -32,6 +32,7 @@ Uma aplicação mobile moderna desenvolvida com **React Native** e **Expo**, foc
 ## 🚀 Como Executar o Projeto
 
 1. **Clone o repositório:**
+
    ```bash
    git clone [https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO.git](https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO.git)
 
@@ -63,16 +64,5 @@ npx expo start
 
 Desenvolvido por **Francisco Dias**
 
-```
 
----
 
-### Dicas para brilhar no GitHub:
-
-1.  **Screenshots Reais:** Nada chama mais a atenção de um recrutador do que imagens reais. Você pode usar o site [shots.so](https://shots.so) para colocar seus prints dentro de molduras de iPhone/Android.
-2.  **GIF de Demonstração:** Se puder, grave a tela do celular fazendo um cadastro e um cálculo, converta para GIF e coloque logo no início do README.
-3.  **Link do Expo:** Se você publicar seu projeto no Expo, coloque o link para que as pessoas possam testar sem precisar baixar o código.
-
-**Deseja que eu te ajude a gerar uma descrição curta em inglês também, caso queira postar no LinkedIn?**
-
-```
