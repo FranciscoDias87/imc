@@ -1,42 +1,84 @@
-# 💪 Calculadora de IMC Pro
+Para um projeto com esse nível de acabamento visual, o `README.md` precisa vender a ideia de que você se preocupa com a **Experiência do Usuário (UX)** e com a **qualidade do código**.
 
-![React Native](https://img.shields.io/badge/React_Native-v0.81.5-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![Expo](https://img.shields.io/badge/Expo-v54.0.32-000020?style=for-the-badge&logo=expo&logoColor=white)
-![Jest](https://img.shields.io/badge/Jest-98%25_Coverage-C21325?style=for-the-badge&logo=jest&logoColor=white)
-![Platform](https://img.shields.io/badge/Platforms-Android_%7C_iOS_%7C_Web-E0E0E0?style=for-the-badge)
-
-**Uma solução completa de monitoramento de saúde.** Este aplicativo vai além de uma simples calculadora, oferecendo um sistema de autenticação seguro, histórico persistente e um motor de recomendações inteligente baseado em perfil demográfico.
+Aqui está um modelo profissional e moderno para o seu projeto:
 
 ---
 
-## 🧪 A Ciência do Projeto
-O cálculo do Índice de Massa Corporal é realizado através da fórmula da OMS, implementada com precisão decimal:
+```markdown
+# 📱 Calculadora de IMC Pro
 
-$$IMC = \frac{peso}{altura^2}$$
+Uma aplicação mobile moderna desenvolvida com **React Native** e **Expo**, focada em monitoramento de saúde com uma interface elegante, animações fluidas e persistência de dados local.
 
-O diferencial deste app é o **Motor de Dicas**, que cruza o resultado do IMC com a faixa etária e sexo biológico para entregar recomendações personalizadas de saúde.
 
----
 
-## 📱 Visual do App
-<div align="center">
-  <img src="assets/screenshots/login.png" width="200" />
-  <img src="assets/screenshots/home.png" width="200" />
-  <img src="assets/screenshots/history.png" width="200" />
-  <img src="assets/screenshots/tips.png" width="200" />
-  <p><em>(Screenshots do App rodando em ambiente Android e iOS)</em></p>
-</div>
+## ✨ Funcionalidades
 
----
+- 🧮 **Cálculo de IMC Preciso:** Baseado em peso, altura, idade e sexo.
+- 💡 **Dicas Personalizadas:** Sugestões de alimentação e exercícios baseadas nos resultados.
+- 🕒 **Histórico em Timeline:** Acompanhamento visual da evolução do usuário ao longo do tempo.
+- 🔐 **Autenticação Local:** Sistema de cadastro e login com persistência de dados.
+- 🎨 **UI/UX Moderna:** Interface limpa, feedbacks táteis com `Animated` API e design responsivo.
 
-## 🏆 O Diferencial: Qualidade de Código (98% Coverage)
-Este projeto foi desenvolvido seguindo rigorosos padrões de **Test-Driven Development (TDD)** em módulos críticos.
+## 🛠️ Tecnologias Utilizadas
 
-- ✅ **+50 Testes Automatizados**
-- ✅ **Testes de Integração** com AsyncStorage.
-- ✅ **Mocks de Navegação** para garantir a integridade do fluxo de usuário.
-- ✅ **Validação de Edge Cases** (entradas nulas, valores absurdos, erros de rede).
+* [React Native](https://reactnative.dev/)
+* [Expo](https://expo.dev/)
+* [React Navigation](https://reactnavigation.org/) (Stack & Tabs)
+* [AsyncStorage](https://react-native-async-storage/async-storage) (Persistência de dados)
+* [Lucide / Ionicons](https://icons.expo.fyi/) (Iconografia)
 
+## 📸 Screenshots
+
+| Login | Cadastro | Home | Histórico |
+|-------|----------|------|-----------|
+| ![Login](https://via.placeholder.com/200x400?text=Login+Screen) | ![Cadastro](https://via.placeholder.com/200x400?text=Register+Screen) | ![Home](https://via.placeholder.com/200x400?text=Home+Screen) | ![Histórico](https://via.placeholder.com/200x400?text=History+Screen) |
+
+> **Dica:** Substitua as imagens acima pelos prints reais do seu app rodando!
+
+## 🚀 Como Executar o Projeto
+
+1. **Clone o repositório:**
+   ```bash
+   git clone [https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO.git](https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO.git)
+
+```
+
+2. **Instale as dependências:**
 ```bash
-# Para verificar a saúde do projeto
-npm run test:coverage
+npm install
+
+```
+
+
+3. **Inicie o Expo Go:**
+```bash
+npx expo start
+
+```
+
+
+4. Escaneie o QR Code com o app do **Expo Go** (Android) ou a câmera (iOS).
+
+## 📝 Detalhes Técnicos
+
+* **Animações:** Utilização da biblioteca `Animated` para efeitos de escala em botões e transições de opacidade em cards de resultado.
+* **Arquitetura:** Organização dividida em `screens`, `services` (para lógica de Storage) e `utils` (para cálculos matemáticos).
+* **Feedback Visual:** Inputs com estados de foco dinâmicos e cores semânticas para as classificações do IMC.
+
+---
+
+Desenvolvido por **Francisco Dias**
+
+```
+
+---
+
+### Dicas para brilhar no GitHub:
+
+1.  **Screenshots Reais:** Nada chama mais a atenção de um recrutador do que imagens reais. Você pode usar o site [shots.so](https://shots.so) para colocar seus prints dentro de molduras de iPhone/Android.
+2.  **GIF de Demonstração:** Se puder, grave a tela do celular fazendo um cadastro e um cálculo, converta para GIF e coloque logo no início do README.
+3.  **Link do Expo:** Se você publicar seu projeto no Expo, coloque o link para que as pessoas possam testar sem precisar baixar o código.
+
+**Deseja que eu te ajude a gerar uma descrição curta em inglês também, caso queira postar no LinkedIn?**
+
+```
