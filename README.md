@@ -1,3 +1,9 @@
+Para um projeto com esse nível de acabamento visual, o `README.md` precisa vender a ideia de que você se preocupa com a **Experiência do Usuário (UX)** e com a **qualidade do código**.
+
+Aqui está um modelo profissional e moderno para o seu projeto:
+
+---
+
 ```markdown
 # 📱 Calculadora de IMC Pro
 
