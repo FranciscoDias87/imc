@@ -1,20 +1,24 @@
+//src/screens/App.js
+
+import 'regenerator-runtime/runtime';
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, Platform} from 'react-native';
 
 import LoginScreen from './src/screens/LoginScreen';
-import RegisterScreen from './src/screens/RegisterScreen';
+import RegisterScreen from './src/screens/RegisterScreen'
 import HomeScreen from './src/screens/HomeScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import { getCurrentUser } from './src/services/storage';
 
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MainTabs() {
+function MainTabs({onLogout}) {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -33,12 +37,14 @@ function MainTabs() {
       />
       <Tab.Screen
         name="History"
-        component={HistoryScreen}
+        
         options={{
           tabBarLabel: 'Histórico',
           tabBarIcon: ({ color }) => <View style={{ width: 24, height: 24, backgroundColor: color }} />,
         }}
-      />
+      >
+        {(props) => <HistoryScreen {...props} onLogout={onLogout}/>}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
@@ -47,15 +53,27 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
+  
+  const handleLoginSucess = () =>{
+    setIsAuthenticated(true);
+  }
+  
+  const checkAuth = async () => {    
+    try{
+      const user = await getCurrentUser();
+      setIsAuthenticated(!!user);
+    }catch(err){
+      setIsAuthenticated(false);
+    }finally{      
+      setIsLoading(false);
+    }  
+    
+  };
+
+  useEffect(() => {   
     checkAuth();
   }, []);
 
-  const checkAuth = async () => {
-    const user = await getCurrentUser();
-    setIsAuthenticated(!!user);
-    setIsLoading(false);
-  };
 
   if (isLoading) {
     return (
@@ -65,18 +83,25 @@ export default function App() {
     );
   }
 
+  
+
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!isAuthenticated ? (
           <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-          </>
-        ) : (
-          <Stack.Screen name="Main" component={MainTabs} />
-        )}
+          <Stack.Screen name='Login'>
+            {(props) => <LoginScreen {...props} onLoginSuccess={()=> setIsAuthenticated(true)}/>}
+          </Stack.Screen>
+          <Stack.Screen name='Register' component={RegisterScreen}/> 
+          </>         
+        ):(
+          <Stack.Screen name='Main'>
+            {(props) => <MainTabs {...props} onLogout={()=>setIsAuthenticated(false)}/> }
+          </Stack.Screen>
+        )
+        }
       </Stack.Navigator>
     </NavigationContainer>
   );

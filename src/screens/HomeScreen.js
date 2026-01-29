@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,16 +7,22 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
+  Animated,
+  Pressable,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { getCurrentUser, saveIMCHistory } from '../services/storage';
 import { calculateIMC, getIMCClassification, getPersonalizedTips } from '../utils/imcCalculator';
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen() {
   const [user, setUser] = useState(null);
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
   const [result, setResult] = useState(null);
   const [tips, setTips] = useState(null);
+
+  // Animação para o card de resultado aparecer suavemente
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     loadUser();
@@ -62,6 +68,14 @@ export default function HomeScreen({ navigation }) {
     });
     setTips(personalizedTips);
 
+    // Dispara animação do resultado
+    fadeAnim.setValue(0);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
+
     await saveIMCHistory(user.email, {
       imc,
       weight: weightNum,
@@ -70,76 +84,89 @@ export default function HomeScreen({ navigation }) {
     });
   };
 
-  if (!user) {
-    return (
-      <View style={styles.container}>
-        <Text>Carregando...</Text>
-      </View>
-    );
-  }
+  if (!user) return null;
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.greeting}>Olá, {user.name.split(' ')[0]} 👋</Text>
+          <Text style={styles.subtitle}>Vamos verificar sua saúde hoje?</Text>
+        </View>
+      </View>
+
       <View style={styles.content}>
-        <Text style={styles.greeting}>Olá, {user.name}!</Text>
-        <Text style={styles.subtitle}>Calcule seu IMC</Text>
+        <View style={styles.formCard}>
+          <Text style={styles.formTitle}>Novo Cálculo</Text>
+          
+          <View style={styles.row}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Peso (kg)</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="speedometer-outline" size={20} color="#64748B" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="70.5"
+                  value={weight}
+                  onChangeText={setWeight}
+                  keyboardType="decimal-pad"
+                />
+              </View>
+            </View>
 
-        <View style={styles.form}>
-          <Text style={styles.label}>Peso (kg)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ex: 70.5"
-            value={weight}
-            onChangeText={setWeight}
-            keyboardType="decimal-pad"
-          />
-
-          <Text style={styles.label}>Altura (cm)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ex: 175"
-            value={height}
-            onChangeText={setHeight}
-            keyboardType="decimal-pad"
-          />
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Altura (cm)</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="resize-outline" size={20} color="#64748B" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="175"
+                  value={height}
+                  onChangeText={setHeight}
+                  keyboardType="decimal-pad"
+                />
+              </View>
+            </View>
+          </View>
 
           <TouchableOpacity style={styles.button} onPress={handleCalculate}>
-            <Text style={styles.buttonText}>Calcular IMC</Text>
+            <Text style={styles.buttonText}>Calcular Agora</Text>
+            <Ionicons name="arrow-forward" size={20} color="#FFF" />
           </TouchableOpacity>
         </View>
 
         {result && (
-          <View style={[styles.resultCard, { borderLeftColor: result.color }]}>
-            <Text style={styles.resultTitle}>Seu IMC</Text>
-            <Text style={[styles.resultValue, { color: result.color }]}>
-              {result.imc}
-            </Text>
-            <Text style={styles.resultClassification}>
-              {result.classification}
-            </Text>
-          </View>
+          <Animated.View style={[styles.resultCard, { opacity: fadeAnim }]}>
+            <View style={[styles.colorIndicator, { backgroundColor: result.color }]} />
+            <Text style={styles.resultLabel}>Seu IMC atual</Text>
+            <Text style={[styles.resultValue, { color: result.color }]}>{result.imc}</Text>
+            <View style={[styles.badge, { backgroundColor: result.color + '20' }]}>
+              <Text style={[styles.badgeText, { color: result.color }]}>
+                {result.classification}
+              </Text>
+            </View>
+          </Animated.View>
         )}
 
         {tips && (
           <View style={styles.tipsContainer}>
-            <View style={styles.tipsSection}>
-              <Text style={styles.tipsTitle}>💚 Dicas de Alimentação</Text>
-              {tips.nutrition.map((tip, index) => (
-                <View key={index} style={styles.tipItem}>
-                  <Text style={styles.tipText}>{tip}</Text>
-                </View>
+            <View style={styles.tipSection}>
+              <View style={styles.tipHeader}>
+                <Ionicons name="nutrition" size={24} color="#10B981" />
+                <Text style={styles.tipSectionTitle}>Alimentação</Text>
+              </View>
+              {tips.nutrition.map((tip, i) => (
+                <Text key={i} style={styles.tipText}>• {tip}</Text>
               ))}
             </View>
 
-            <View style={styles.tipsSection}>
-              <Text style={styles.tipsTitle}>💪 Dicas de Exercícios</Text>
-              <Text style={styles.tipsSubtitle}>
-                Baseado na sua idade ({user.age} anos) e sexo ({user.gender})
-              </Text>
-              {tips.exercise.map((tip, index) => (
-                <View key={index} style={styles.tipItem}>
-                  <Text style={styles.tipText}>{tip}</Text>
-                </View>
+            <View style={styles.tipSection}>
+              <View style={styles.tipHeader}>
+                <Ionicons name="bicycle" size={24} color="#4A62FF" />
+                <Text style={styles.tipSectionTitle}>Exercícios</Text>
+              </View>
+              {tips.exercise.map((tip, i) => (
+                <Text key={i} style={styles.tipText}>• {tip}</Text>
               ))}
             </View>
           </View>
@@ -150,109 +177,60 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  content: {
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  header: { paddingHorizontal: 25, paddingTop: 60, paddingBottom: 20 },
+  greeting: { fontSize: 24, fontWeight: '800', color: '#1E293B' },
+  subtitle: { fontSize: 16, color: '#64748B', marginTop: 4 },
+  content: { paddingHorizontal: 20 },
+  formCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 24,
     padding: 20,
-  },
-  greeting: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginTop: 20,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#7f8c8d',
-    marginBottom: 25,
-  },
-  form: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 4,
     marginBottom: 20,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2c3e50',
-    marginBottom: 8,
-    marginTop: 10,
+  formTitle: { fontSize: 18, fontWeight: '700', color: '#1E293B', marginBottom: 15 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
+  inputGroup: { width: '48%' },
+  label: { fontSize: 14, fontWeight: '600', color: '#64748B', marginBottom: 8 },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F1F5F9',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    height: 50,
   },
-  input: {
-    backgroundColor: '#f9f9f9',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    padding: 15,
-    fontSize: 16,
-  },
+  input: { flex: 1, marginLeft: 8, fontSize: 16, color: '#1E293B', fontWeight: '600' },
   button: {
-    backgroundColor: '#3498db',
-    padding: 16,
-    borderRadius: 10,
+    backgroundColor: '#4A62FF',
+    flexDirection: 'row',
+    height: 56,
+    borderRadius: 16,
     alignItems: 'center',
-    marginTop: 20,
+    justifyContent: 'center',
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+  buttonText: { color: '#FFF', fontSize: 16, fontWeight: '700', marginRight: 8 },
   resultCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF',
+    borderRadius: 24,
     padding: 25,
-    borderRadius: 15,
     alignItems: 'center',
     marginBottom: 20,
-    borderLeftWidth: 5,
+    position: 'relative',
+    overflow: 'hidden',
   },
-  resultTitle: {
-    fontSize: 18,
-    color: '#7f8c8d',
-    marginBottom: 10,
-  },
-  resultValue: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  resultClassification: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#2c3e50',
-  },
-  tipsContainer: {
-    marginBottom: 30,
-  },
-  tipsSection: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 15,
-    marginBottom: 15,
-  },
-  tipsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: 5,
-  },
-  tipsSubtitle: {
-    fontSize: 14,
-    color: '#7f8c8d',
-    marginBottom: 15,
-    fontStyle: 'italic',
-  },
-  tipItem: {
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  tipText: {
-    fontSize: 15,
-    color: '#34495e',
-    lineHeight: 22,
-  },
+  colorIndicator: { position: 'absolute', top: 0, left: 0, right: 0, height: 4 },
+  resultLabel: { fontSize: 14, color: '#64748B', fontWeight: '600' },
+  resultValue: { fontSize: 56, fontWeight: '900', marginVertical: 5 },
+  badge: { paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20 },
+  badgeText: { fontWeight: '700', fontSize: 14 },
+  tipsContainer: { marginBottom: 40 },
+  tipSection: { backgroundColor: '#FFF', borderRadius: 20, padding: 20, marginBottom: 15 },
+  tipHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  tipSectionTitle: { fontSize: 17, fontWeight: '700', color: '#1E293B', marginLeft: 10 },
+  tipText: { fontSize: 15, color: '#475569', lineHeight: 22, marginBottom: 8 },
 });
