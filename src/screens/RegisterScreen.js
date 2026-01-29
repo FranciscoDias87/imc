@@ -16,6 +16,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { registerUser } from '../services/storage';
 
+const InputField = ({ label, icon, ...props }) => (
+  <View style={styles.inputWrapper}>
+    <Text style={styles.label}>{label}</Text>
+    <View style={styles.inputContainer}>
+      <Ionicons name={icon} size={20} color="#94A3B8" />
+      <TextInput style={styles.input} placeholderTextColor="#94A3B8" {...props} />
+    </View>
+  </View>
+);
+
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -32,17 +42,48 @@ export default function RegisterScreen({ navigation }) {
   const animateOut = () => Animated.spring(scaleValue, { toValue: 1, friction: 3, tension: 40, useNativeDriver: true }).start();
 
   const handleRegister = async () => {
-    if (!name || !email || !password || !age || !weight || !height) {
+
+    //Limpa de strings(remove espaços vazios acidentais, deixa o email com letra minuscula)
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanName || !cleanEmail || !password || !age || !weight || !height) {
       Alert.alert('Erro', 'Preencha todos os campos para continuar');
       return;
     }
 
+    //conversão e validação numerica
+    const nAge = parentInt(age);
+    const nWeight = parseFloat(weight.replace(',', '.'));
+    const nHeigth = parseFloat(height.replace(',', '.'));
+
+    //Validação de numero negativos ou zerados
+    if (nAge <= 0 | nWeight <= 0 | nHeigth <= 0) {
+      Alert.alert('Erro', 'Idade, Peso e Altura devem ser número positivos mairoes que zero.');
+      return;
+    }
+
+    //validação de valores realistas
+    if (nAge > 120 | nWeight > 500 | nHeigth > 500) {
+      Alert.alert('Erro, Por favor insira números válidos.')
+      return;
+    }
+
+    //valida email
+    const emailRegex = /\S+@\+.\S+/;
+    if (!emailRegex.test(cleanEmail)) {
+      Alert.alert('Erro', 'Por favor insira um email válido!.');
+      return;
+    }
+
     const userData = {
-      name, email, password,
-      age: parseInt(age),
+      name: cleanName,
+      email: cleanEmail,
+      password,
+      age: nAge,
       gender,
-      weight: parseFloat(weight),
-      height: parseFloat(height),
+      weight: nWeight,
+      height: nHeigth,
     };
 
     setLoading(true);
@@ -58,19 +99,11 @@ export default function RegisterScreen({ navigation }) {
     }
   };
 
-  const InputField = ({ label, icon, ...props }) => (
-    <View style={styles.inputWrapper}>
-      <Text style={styles.label}>{label}</Text>
-      <View style={styles.inputContainer}>
-        <Ionicons name={icon} size={20} color="#94A3B8" />
-        <TextInput style={styles.input} placeholderTextColor="#94A3B8" {...props} />
-      </View>
-    </View>
-  );
+
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
+    <KeyboardAvoidingView
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -89,7 +122,13 @@ export default function RegisterScreen({ navigation }) {
 
             <View style={styles.row}>
               <View style={{ flex: 1, marginRight: 10 }}>
-                <InputField label="Idade" icon="calendar-outline" placeholder="25" value={age} onChangeText={setAge} keyboardType="numeric" />
+                <InputField 
+                  label="Idade" 
+                  icon="calendar-outline" 
+                  placeholder="25" 
+                  value={age} 
+                  onChangeText={(text)=>setAge(text.replace(/[^0-9]/g, ''))} 
+                  keyboardType="number-pad" />
               </View>
               <View style={{ flex: 1.2 }}>
                 <Text style={styles.label}>Sexo</Text>
@@ -108,10 +147,22 @@ export default function RegisterScreen({ navigation }) {
 
             <View style={styles.row}>
               <View style={{ flex: 1, marginRight: 10 }}>
-                <InputField label="Peso (kg)" icon="speedometer-outline" placeholder="70.5" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" />
+                <InputField 
+                  label="Peso (kg)" 
+                  icon="speedometer-outline" 
+                  placeholder="70.5" 
+                  value={weight} 
+                  onChangeText={(text)=> setWeight(text.replace(/[^0-9.,]/g, ''))} 
+                  keyboardType="decimal-pad" />
               </View>
               <View style={{ flex: 1 }}>
-                <InputField label="Altura (cm)" icon="resize-outline" placeholder="175" value={height} onChangeText={setHeight} keyboardType="decimal-pad" />
+                <InputField 
+                  label="Altura (cm)" 
+                  icon="resize-outline" 
+                  placeholder="175" 
+                  value={height} 
+                  onChangeText={(text)=> setHeight(text.replace(/[^0-9]/g,''))} 
+                  keyboardType="decimal-pad" />
               </View>
             </View>
 
