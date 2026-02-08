@@ -88,7 +88,7 @@ export default function LoginScreen({ navigation, onLoginSuccess }) {
               <Ionicons name="lock-closed-outline" size={20} color={isPassFocused ? "#4A62FF" : "#94A3B8"} />
               <TextInput
                 style={styles.input}
-                placeholder="Sua pawwardodas"
+                placeholder="Password"
                 placeholderTextColor="#94A3B8"
                 value={password}
                 onChangeText={setPassword}
