@@ -35,24 +35,27 @@ Uma aplicação mobile moderna desenvolvida com **React Native** e **Expo**, foc
 
    ```bash
    git clone [https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO.git](https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO.git)
-
+```
 ```
 
 2. **Instale as dependências:**
+
 ```bash
 npm install
-
 ```
 
 
 3. **Inicie o Expo Go:**
+
+
 ```bash
 npx expo start
-
 ```
 
 
 4. Escaneie o QR Code com o app do **Expo Go** (Android) ou a câmera (iOS).
+
+
 
 ## 📝 Detalhes Técnicos
 
