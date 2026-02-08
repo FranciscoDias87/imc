@@ -61,7 +61,7 @@ export default function HistoryScreen({ navigation, onLogout }) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      
+
       {/* HEADER MODERNO */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
@@ -73,7 +73,7 @@ export default function HistoryScreen({ navigation, onLogout }) {
             <Ionicons name="log-out-outline" size={22} color="#FFF" />
           </TouchableOpacity>
         </View>
-        
+
         {/* CARD DE PERFIL RÁPIDO */}
         <View style={styles.profileBadge}>
           <Text style={styles.profileBadgeText}>
@@ -82,8 +82,8 @@ export default function HistoryScreen({ navigation, onLogout }) {
         </View>
       </View>
 
-      <ScrollView 
-        style={styles.content} 
+      <ScrollView
+        style={styles.content}
         contentContainerStyle={{ paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
@@ -157,14 +157,14 @@ const styles = StyleSheet.create({
   },
   profileBadgeText: { color: '#FFF', fontSize: 12, fontWeight: '600' },
   content: { flex: 1, paddingHorizontal: 20, marginTop: 20 },
-  
+
   // ESTILO DE TIMELINE
   historyCard: { flexDirection: 'row', marginBottom: 20 },
   cardSidebar: { alignItems: 'center', width: 50, marginRight: 15 },
   dateDay: { fontSize: 18, fontWeight: '800', color: '#1E293B' },
   dateMonth: { fontSize: 12, fontWeight: '600', color: '#64748B', textTransform: 'uppercase' },
   timelineLine: { width: 2, flex: 1, backgroundColor: '#E2E8F0', marginTop: 10, borderRadius: 1 },
-  
+
   cardMain: {
     flex: 1,
     backgroundColor: '#FFF',
