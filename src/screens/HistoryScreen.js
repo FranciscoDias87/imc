@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { getCurrentUser, getIMCHistory, logout } from '../services/storage';
 import { getIMCClassification } from '../utils/imcCalculator';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function HistoryScreen({ navigation, onLogout }) {
   const [user, setUser] = useState(null);
@@ -60,66 +61,102 @@ export default function HistoryScreen({ navigation, onLogout }) {
       },
     ]);
   };
+
+  const handleDelete = async (id) => {
+    Alert.alert('Excluir Registro',
+      'Tem certeza que deseja excluir este registro do histórico?', 
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Excluir', 
+          style: 'destructive', 
+          onPress: async () => {
+            const success = await deleteImcHistory(id);
+            if (success) {
+             setHistory(history.filter(item => item.id !== id))
+            }else{
+              Alert.alert('Erro', 'Não foi possível excluir o registro. Tente novamente mais tarde.');
+            }          
+          loadData();
+        } },
+      ]); 
+    }
+
+    const renderRightActions = (id)=>{
+      return(
+        <TouchableOpacity          
+          style={styles.deleteAction}
+          onPress={() => handleDelete(id)}
+        >
+          <Ionicons name="trash-outline" size={24} color="#FFF" />
+          <Text style={styles.deleteActionText}>Excluir</Text>
+        </TouchableOpacity>
+      )
+    }
   
   if (!user) return null;
 
-
-
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content" />
 
-      {/* HEADER MODERNO */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View>
-            <Text style={styles.headerTitle}>Meu Histórico</Text>
-            <Text style={styles.headerSubtitle}>{user.name}</Text>
+        {/* HEADER MODERNO */}
+        <View style={styles.header}>
+          <View style={styles.headerContent}>
+            <View>
+              <Text style={styles.headerTitle}>Meu Histórico</Text>
+              <Text style={styles.headerSubtitle}>{user.name}</Text>
+            </View>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Ionicons name="log-out-outline" size={22} color="#FFF" />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={22} color="#FFF" />
-          </TouchableOpacity>
-        </View>
 
-        {/* CARD DE PERFIL RÁPIDO */}
-        <View style={styles.profileBadge}>
-          <Text style={styles.profileBadgeText}>
-            {user.age} anos • {user.gender} • {user.height}cm
-          </Text>
-        </View>
-      </View>
-
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={{ paddingBottom: 40 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {history.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="clipboard-outline" size={80} color="#CBD5E1" />
-            <Text style={styles.emptyTitle}>Sem registros</Text>
-            <Text style={styles.emptyText}>
-              Seus cálculos aparecerão aqui para você acompanhar sua evolução.
+          {/* CARD DE PERFIL RÁPIDO */}
+          <View style={styles.profileBadge}>
+            <Text style={styles.profileBadgeText}>
+              {user.age} anos • {user.gender} • {user.height}cm
             </Text>
           </View>
-        ) : (            
-              history.map((item, index) => {
-                // 1. Pegamos as informações de cor baseadas no IMC salvo
-                const categoryInfo = getIMCClassification(item.imc);
+        </View>
 
-                // 2. Formatamos a data (vinda do 'created_at' do Supabase)
-                const dateParts = formatDate(item.created_at).split(' ');
-                const day = dateParts[0];
-                const month = dateParts[1];
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={{ paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {history.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Ionicons name="clipboard-outline" size={80} color="#CBD5E1" />
+              <Text style={styles.emptyTitle}>Sem registros</Text>
+              <Text style={styles.emptyText}>
+                Seus cálculos aparecerão aqui para você acompanhar sua evolução.
+              </Text>
+            </View>
+          ) : (
+            history.map((item, index) => {
+              // 1. Pegamos as informações de cor baseadas no IMC salvo
+              const categoryInfo = getIMCClassification(item.imc);
 
-                return (
-                  <View key={item.id || index} style={styles.historyCard}>
-                    {/* SIDEBAR COM DATA */}
-                    <View style={styles.cardSidebar}>
-                      <Text style={styles.dateDay}>{day}</Text>
-                      <Text style={styles.dateMonth}>{month}</Text>
-                      <View style={styles.timelineLine} />
-                    </View>
+              // 2. Formatamos a data (vinda do 'created_at' do Supabase)
+              const dateParts = formatDate(item.created_at).split(' ');
+              const day = dateParts[0];
+              const month = dateParts[1];
+
+              return (
+                <View key={item.id || index} style={styles.historyCard}>
+                  {/* SIDEBAR COM DATA */}
+                  <View style={styles.cardSidebar}>
+                    <Text style={styles.dateDay}>{day}</Text>
+                    <Text style={styles.dateMonth}>{month}</Text>
+                    <View style={styles.timelineLine} />
+                  </View>
+                  {/* CARD DESLIZAVEL */}
+                  <Swipeable
+                    renderRightActions={() => renderRightActions(item.id)}
+                    friction={2}
+                    rightThreshold={40}
+                  >
 
                     {/* CONTEÚDO DO CARD */}
                     <View style={styles.cardMain}>
@@ -151,13 +188,15 @@ export default function HistoryScreen({ navigation, onLogout }) {
                         </View>
                       </View>
                     </View>
-                  </View>
-                );//fim do return do map
-              }) //fim do map
-            )
-        }
-      </ScrollView>
-    </View>
+                  </Swipeable>
+                </View>
+              );//fim do return do map
+            }) //fim do map
+          )
+          }
+        </ScrollView>
+      </View>
+    </GestureHandlerRootView>
   );
 }
 
@@ -218,4 +257,19 @@ const styles = StyleSheet.create({
   emptyState: { alignItems: 'center', marginTop: 80 },
   emptyTitle: { fontSize: 20, fontWeight: '700', color: '#475569', marginTop: 20 },
   emptyText: { fontSize: 15, color: '#94A3B8', textAlign: 'center', marginTop: 10, paddingHorizontal: 40 },
+  deleteAction: {
+    backgroundColor: '#EF4444',
+    justifyContent: 'center', 
+    alignItems: 'center',
+    width:80,
+    height: '88%',
+    borderRadius: 12,
+    marginLeft: 10,    
+  },
+  deleteActionText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '700',
+    marginTop: 4,
+  }
 });

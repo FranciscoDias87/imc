@@ -131,14 +131,26 @@ export const getImcHistory = async (userId) =>{
     .select('*')
     .eq('user_id', userId)
     .order('created_at', {ascending: false});
-
     if (error) throw error;
-
     return data || [ ]; //retorna um array vazio se não houver dados
-
   }catch(error){
     console.error("Erro ao obter histórico de IMC do Supabase: ", error);
     return [];
+  }
+}
+
+export const deleteIMCRecord = async (recordId)=>{
+  try{
+    const {error} = await supabase
+    .from('imc_history')
+    .delete()
+    .eq('id', recordId); //deleta o registro que estiver neste Id
+    
+    if(error) throw error;
+    return true;
+  }catch(error){
+    console.error("Erro ao deletar registro de IMC: ", error);
+    return false;
   }
 }
 
