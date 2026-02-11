@@ -43,8 +43,8 @@ export default function HomeScreen() {
       return;
     }
 
-    const weightNum = parseFloat(weight);
-    const heightNum = parseFloat(height);
+    const weightNum = parseFloat(weight.replace(',', '.'));
+    const heightNum = parseFloat(height.replace(',', '.'));
 
     if (weightNum <= 0 || heightNum <= 0) {
       Alert.alert('Erro', 'Valores devem ser maiores que zero');
@@ -76,14 +76,20 @@ export default function HomeScreen() {
       useNativeDriver: true,
     }).start();
 
-    await saveIMCHistory(user.email, {
+
+    const success = await saveIMCHistory(user.id, {
       imc,
       weight: weightNum,
       height: heightNum,
       classification: classification.category,
     });
+
+    if (!success) {
+      Alert.alert('Aviso', 'Não foi possível salvar o histórico do IMC. Tente novamente mais tarde.');
+    }
   };
 
+  // Se o usuário não estiver logado, mostramos uma tela de boas-vindas genérica
   if (!user) return null;
 
   return (
