@@ -54,7 +54,7 @@ export default function RegisterScreen({ navigation }) {
     }
 
     //validação de email
-    const emailRegex = /\S+@\+.\S+/;
+    const emailRegex = /\S+@\S+.\S+/;
     if (!emailRegex.test(cleanEmail)) {
       Alert.alert('Erro', 'Por favor insira um email válido!.');
       return;
@@ -95,7 +95,7 @@ export default function RegisterScreen({ navigation }) {
       age: nAge,
       gender,
       weight: nWeight,
-      height: nHeigth,
+      height: nHeight,
     };
 
     setLoading(true);
@@ -131,9 +131,17 @@ export default function RegisterScreen({ navigation }) {
             <Text style={styles.subtitle}>Preencha seus dados de saúde</Text>
 
             <View style={styles.form}>
-              <InputField label="Nome completo" icon="person-outline" placeholder="Seu nome" value={name} onChangeText={setName} />
-              <InputField label="E-mail" icon="mail-outline" placeholder="seu@email.com" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-              <InputField label="Senha" icon="lock-closed-outline" placeholder="Sua senha" value={password} onChangeText={setPassword} secureTextEntry />
+              <InputField 
+              label="Nome completo" icon="person-outline" placeholder="Seu nome" value={name} 
+              onChangeText={setName} 
+              />
+              <InputField 
+              label="E-mail" icon="mail-outline" placeholder="seu@email.com" value={email} 
+              onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" 
+              />
+              <InputField 
+              label="Senha" icon="lock-closed-outline" placeholder="Sua senha" value={password} 
+              onChangeText={setPassword} secureTextEntry />
 
               <View style={styles.row}>
                 <View style={{ flex: 1, marginRight: 10 }}>

@@ -1,6 +1,6 @@
 //src/screens/LoginScreen
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, use, useEffect } from 'react';
 import {
   View,
   Text,
@@ -48,6 +48,8 @@ export default function LoginScreen({ navigation, onLoginSuccess }) {
       Alert.alert('Erro', result.message);
     }
   };
+
+  
 
   return (
     <KeyboardAvoidingView

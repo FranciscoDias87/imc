@@ -13,6 +13,7 @@ import RegisterScreen from './src/screens/RegisterScreen'
 import HomeScreen from './src/screens/HomeScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import { getCurrentUser } from './src/services/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Stack = createStackNavigator();
@@ -73,8 +74,7 @@ export default function App() {
   useEffect(() => {   
     checkAuth();
   }, []);
-
-
+  
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
