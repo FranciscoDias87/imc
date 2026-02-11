@@ -11,7 +11,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { getCurrentUser, getIMCHistory, logout } from '../services/storage';
 import { getIMCClassification } from '../utils/imcCalculator';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { 
+  GestureHandlerRootView, 
+  Swipeable 
+} from 'react-native-gesture-handler';
 
 export default function HistoryScreen({ navigation, onLogout }) {
   const [user, setUser] = useState(null);

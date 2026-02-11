@@ -1,5 +1,5 @@
 //src/screens/App.js
-
+import 'react-native-gesture-handler';
 import 'regenerator-runtime/runtime';
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
