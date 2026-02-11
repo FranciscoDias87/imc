@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getCurrentUser, getIMCHistory, logout } from '../services/storage';
+import { getIMCClassification } from '../utils/imcCalculator';
 
 export default function HistoryScreen({ navigation, onLogout }) {
   const [user, setUser] = useState(null);
@@ -27,10 +28,24 @@ export default function HistoryScreen({ navigation, onLogout }) {
     const userData = await getCurrentUser();
     setUser(userData);
     if (userData) {
-      const historyData = await getIMCHistory(userData.email);
+      const historyData = await getIMCHistory(userData.id);
       setHistory(historyData);
     }
   };
+
+  // Função para formatar a data de forma amigável
+  const formateDate = (dateString) => {
+    if (!dateString) return "--";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+  }
+
+  // Função para formatar a hora de forma amigável
+  const formateTime = (dateString) => {
+    if (!dateString) return "--";
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
 
   const handleLogout = async () => {
     Alert.alert('Sair', 'Deseja realmente sair da sua conta?', [
@@ -45,18 +60,10 @@ export default function HistoryScreen({ navigation, onLogout }) {
       },
     ]);
   };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
-  };
-
-  const formatTime = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  };
-
+  
   if (!user) return null;
+
+
 
   return (
     <View style={styles.container}>
@@ -95,35 +102,60 @@ export default function HistoryScreen({ navigation, onLogout }) {
               Seus cálculos aparecerão aqui para você acompanhar sua evolução.
             </Text>
           </View>
-        ) : (
-          history.map((item, index) => (
-            <View key={index} style={styles.historyCard}>
-              <View style={styles.cardSidebar}>
-                <Text style={styles.dateDay}>{formatDate(item.date).split(' ')[0]}</Text>
-                <Text style={styles.dateMonth}>{formatDate(item.date).split(' ')[1]}</Text>
-                <View style={styles.timelineLine} />
-              </View>
+        ) : (            
+              history.map((item, index) => {
+                // 1. Pegamos as informações de cor baseadas no IMC salvo
+                const categoryInfo = getIMCClassification(item.imc);
 
-              <View style={styles.cardMain}>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.cardTime}>{formatTime(item.date)}</Text>
-                  <Text style={styles.classificationText}>{item.classification}</Text>
-                </View>
+                // 2. Formatamos a data (vinda do 'created_at' do Supabase)
+                const dateParts = formatDate(item.created_at).split(' ');
+                const day = dateParts[0];
+                const month = dateParts[1];
 
-                <View style={styles.statsRow}>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statLabel}>IMC</Text>
-                    <Text style={styles.statValue}>{item.imc}</Text>
+                return (
+                  <View key={item.id || index} style={styles.historyCard}>
+                    {/* SIDEBAR COM DATA */}
+                    <View style={styles.cardSidebar}>
+                      <Text style={styles.dateDay}>{day}</Text>
+                      <Text style={styles.dateMonth}>{month}</Text>
+                      <View style={styles.timelineLine} />
+                    </View>
+
+                    {/* CONTEÚDO DO CARD */}
+                    <View style={styles.cardMain}>
+                      <View style={styles.cardHeader}>
+                        <Text style={styles.cardTime}>{formatTime(item.created_at)}</Text>
+                        {/* Aplicando a cor dinâmica na classificação */}
+                        <Text style={[styles.classificationText, { color: categoryInfo.color }]}>
+                          {item.classification}
+                        </Text>
+                      </View>
+
+                      <View style={styles.statsRow}>
+                        <View style={styles.statItem}>
+                          <Text style={styles.statLabel}>IMC</Text>
+                          {/* IMC com cor dinâmica */}
+                          <Text style={[styles.statValue, { color: categoryInfo.color }]}>
+                            {item.imc.toFixed(1)}
+                          </Text>
+                        </View>
+
+                        <View style={styles.statItem}>
+                          <Text style={styles.statLabel}>Peso</Text>
+                          <Text style={styles.statValue}>{item.weight}kg</Text>
+                        </View>
+
+                        <View style={styles.statItem}>
+                          <Text style={styles.statLabel}>Altura</Text>
+                          <Text style={styles.statValue}>{item.height}cm</Text>
+                        </View>
+                      </View>
+                    </View>
                   </View>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statLabel}>Peso</Text>
-                    <Text style={styles.statValue}>{item.weight}kg</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          ))
-        )}
+                );//fim do return do map
+              }) //fim do map
+            )
+        }
       </ScrollView>
     </View>
   );
