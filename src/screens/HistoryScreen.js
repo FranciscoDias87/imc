@@ -9,7 +9,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getCurrentUser, getIMCHistory, logout } from '../services/storage';
+import { getCurrentUser, getIMCHistory, logout, deleteImcHistory } from '../services/storage';
 import { getIMCClassification } from '../utils/imcCalculator';
 import { 
   GestureHandlerRootView, 
@@ -38,15 +38,17 @@ export default function HistoryScreen({ navigation, onLogout }) {
   };
 
   // Função para formatar a data de forma amigável
-  const formateDate = (dateString) => {
-    if (!dateString) return "--";
+  const formatDate = (dateString) => {
+    if (!dateString) return "-- --";
     const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = date.toLocaleString('pt-BR', { month: 'short' }).toUpperCase().replace('.', '');
+    return `${day} ${month}`;
   }
 
   // Função para formatar a hora de forma amigável
-  const formateTime = (dateString) => {
-    if (!dateString) return "--";
+  const formatTime = (dateString) => {
+    if (!dateString) return "--:--";
     const date = new Date(dateString);
     return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   }

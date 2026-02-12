@@ -8,18 +8,19 @@ import {
   Alert,
   ScrollView,
   Animated,
-  Pressable,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getCurrentUser, saveIMCHistory } from '../services/storage';
 import { calculateIMC, getIMCClassification, getPersonalizedTips } from '../utils/imcCalculator';
 
-export default function HomeScreen() {
+export default function HomeScreen({navigation}) {
   const [user, setUser] = useState(null);
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
   const [result, setResult] = useState(null);
   const [tips, setTips] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Animação para o card de resultado aparecer suavemente
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -29,23 +30,42 @@ export default function HomeScreen() {
   }, []);
 
   const loadUser = async () => {
-    const userData = await getCurrentUser();
-    setUser(userData);
-    if (userData) {
-      setWeight(userData.weight.toString());
-      setHeight(userData.height.toString());
+    try{
+      setLoading(true);
+      const userData = await getCurrentUser();
+      console.log("Usuário carregado no HomeScreen:", userData);
+      setUser(userData);
+
+      if (userData) {
+        setUser(userData);
+        setWeight(userData.weight?.toString() || '');
+        setHeight(userData.height?.toString() || '');
+      }else{
+       console.warn("Nenhum usuário encontrado no AsyncStorage.");
+      }
+    }catch(error){
+      console.error("Erro ao carregar usuário:", error);
+    }finally{
+      setLoading(false);
     }
   };
 
   const handleCalculate = async () => {
+    if (!user) {
+      Alert.alert('Erro', 'Usuário não encontrado. Faça login novamente.');
+      [
+        {text: 'Recarregar', onPress: loadUser},
+        {text: 'OK'}
+      ]
+    }
+
+    //validação de inputs
     if (!weight || !height) {
       Alert.alert('Erro', 'Preencha peso e altura');
       return;
     }
-
     const weightNum = parseFloat(weight.replace(',', '.'));
     const heightNum = parseFloat(height.replace(',', '.'));
-
     if (weightNum <= 0 || heightNum <= 0) {
       Alert.alert('Erro', 'Valores devem ser maiores que zero');
       return;
@@ -76,27 +96,42 @@ export default function HomeScreen() {
       useNativeDriver: true,
     }).start();
 
+    if (user && user.id){
+        const success = await saveIMCHistory(user.id, {
+        imc,
+        weight: weightNum,
+        height: heightNum,
+        classification: classification.category,
+      });
 
-    const success = await saveIMCHistory(user.id, {
-      imc,
-      weight: weightNum,
-      height: heightNum,
-      classification: classification.category,
-    });
-
-    if (!success) {
-      Alert.alert('Aviso', 'Não foi possível salvar o histórico do IMC. Tente novamente mais tarde.');
+      if(!success){
+        console.error("Falha ao salvar histórico de IMC.");
+      }else{
+        console.log("Histórico de IMC salvo com sucesso.");
+      }
+          
+    } else{
+      console.warn("ID do usuário não encontrado. Histórico de IMC não será salvo.");
     }
+
   };
 
   // Se o usuário não estiver logado, mostramos uma tela de boas-vindas genérica
-  if (!user) return null;
+  if (loading){
+    return(
+      <View style={[styles.container, {justifyContent: 'center', alignItems: 'center'}]}>
+        <Text>Carregando Perfil...</Text>
+      </View>
+    );
+  }
+
+  const userName = user?.name ? user.name.split(' ')[0] : 'Visitante';
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Olá, {user.name.split(' ')[0]} 👋</Text>
+          <Text style={styles.greeting}>Olá, {userName} 👋</Text>
           <Text style={styles.subtitle}>Vamos verificar sua saúde hoje?</Text>
         </View>
       </View>
