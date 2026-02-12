@@ -35,17 +35,20 @@ export default function LoginScreen({ navigation, onLoginSuccess }) {
   };
 
   const handleLogin = async () => {
-    if (!email || !password) {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password.trim();
+    if (!cleanEmail || !cleanPassword) {
       Alert.alert('Erro', 'Preencha todos os campos');
       return;
     }
     setLoading(true);
-    const result = await loginUser(email, password);
+    const result = await loginUser(cleanEmail, cleanPassword);
     setLoading(false);
+    
     if (result.success) {
       onLoginSuccess();
     } else {
-      Alert.alert('Erro', result.message);
+      Alert.alert('Erro de acesso: ', result.message);
     }
   };
 

@@ -79,24 +79,25 @@ export const registerUser = async(userData) =>{
 
 export const loginUser = async (email, password) => {
   try{
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanPasswoard = password.trim();
+    
     const { data, error} = await supabase.auth.signInWithPassword({
-      email: cleanEmail,
-      password: cleanPasswoard
+      email,
+      password
     });
     if (error){
       return{success: false, message: "Email ou senha incorretos. Por favor, tente novamente."};
     }
     //criamos um objeto do pertfil com os metadados que salvamos no registro
+    const metadata = data.user.user_metadata;
+
     const userProfile = {
       id: data.user.id,
       email: data.user.email,
-      name: data.user.user_metadata.full_name || "Usuário",
-      age: data.user.user_metadata.age,
-      gender: data.user.user_metadata.gender,
-      weight: data.user.user_metadata.weight,
-      height: data.user.user_metadata.height
+      name: metadata.full_name|| metadata.name || "Usuário",
+      age: metadata.age,
+      gender: metadata.gender,
+      weight: metadata.weight,
+      height: metadata.height
 
   };
   //salvamos o perfil do usuário no AsyncStorage para manter a sessão ativa

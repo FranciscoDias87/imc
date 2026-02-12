@@ -6,7 +6,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, View, Platform} from 'react-native';
+import { ActivityIndicator, View, Platform } from 'react-native';
 
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen'
@@ -19,7 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MainTabs({onLogout}) {
+function MainTabs({ onLogout }) {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -38,13 +38,13 @@ function MainTabs({onLogout}) {
       />
       <Tab.Screen
         name="History"
-        
+
         options={{
           tabBarLabel: 'Histórico',
           tabBarIcon: ({ color }) => <View style={{ width: 24, height: 24, backgroundColor: color }} />,
         }}
       >
-        {(props) => <HistoryScreen {...props} onLogout={onLogout}/>}
+        {(props) => <HistoryScreen {...props} onLogout={onLogout} />}
       </Tab.Screen>
     </Tab.Navigator>
   );
@@ -54,27 +54,27 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  
-  const handleLoginSucess = () =>{
+
+  const handleLoginSucess = () => {
     setIsAuthenticated(true);
   }
-  
-  const checkAuth = async () => {    
-    try{
+
+  const checkAuth = async () => {
+    try {
       const user = await getCurrentUser();
       setIsAuthenticated(!!user);
-    }catch(err){
+    } catch (err) {
       setIsAuthenticated(false);
-    }finally{      
+    } finally {
       setIsLoading(false);
-    }  
-    
+    }
+
   };
 
-  useEffect(() => {   
+  useEffect(() => {
     checkAuth();
   }, []);
-  
+
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -83,22 +83,25 @@ export default function App() {
     );
   }
 
-  
-
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!isAuthenticated ? (
           <>
-          <Stack.Screen name='Login'>
-            {(props) => <LoginScreen {...props} onLoginSuccess={()=> setIsAuthenticated(true)}/>}
-          </Stack.Screen>
-          <Stack.Screen name='Register' component={RegisterScreen}/> 
-          </>         
-        ):(
+            <Stack.Screen name='Login'>
+              {(props) => <LoginScreen {...props} onLoginSuccess={() => setIsAuthenticated(true)} />}
+            </Stack.Screen>
+            <Stack.Screen name='Register' component={RegisterScreen} />
+          </>
+        ) : (
           <Stack.Screen name='Main'>
-            {(props) => <MainTabs {...props} onLogout={()=>setIsAuthenticated(false)}/> }
+            {(props) =>
+              <MainTabs {...props}
+                onLogout={() => {
+                  setIsAuthenticated(false);
+                  AsyncStorage.removeItem('@user');
+                }} />}
           </Stack.Screen>
         )
         }

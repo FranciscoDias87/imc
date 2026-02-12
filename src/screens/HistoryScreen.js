@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   StatusBar,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getCurrentUser, getIMCHistory, logout, deleteImcHistory } from '../services/storage';
@@ -54,17 +55,25 @@ export default function HistoryScreen({ navigation, onLogout }) {
   }
 
   const handleLogout = async () => {
-    Alert.alert('Sair', 'Deseja realmente sair da sua conta?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Sair',
-        style: 'destructive',
-        onPress: async () => {
-          await logout();
-          onLogout();
+    if (Platform.OS === 'web') {
+      const confirmar = confirm('Deseja realmente sair?');
+      if (confirmar){
+        await logout();
+        onLogout();
+      }
+    } else{
+      Alert.alert('Sair', 'Deseja realmente sair da sua conta?', [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: async () => {
+            await logout();
+            onLogout();
+          },
         },
-      },
-    ]);
+      ]);
+    }
   };
 
   const handleDelete = async (id) => {
