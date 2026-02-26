@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "./supabaseConfig";
+import { Platform } from "react-native";
 
 const USER_KEY = "@imc_user_profile"; //chave para armazenar o perfil do usuário no AsyncStorage
 
@@ -78,8 +79,7 @@ export const registerUser = async(userData) =>{
 }
 
 export const loginUser = async (email, password) => {
-  try{
-    
+  try{    
     const { data, error} = await supabase.auth.signInWithPassword({
       email,
       password
@@ -89,7 +89,6 @@ export const loginUser = async (email, password) => {
     }
     //criamos um objeto do pertfil com os metadados que salvamos no registro
     const metadata = data.user.user_metadata;
-
     const userProfile = {
       id: data.user.id,
       email: data.user.email,
@@ -161,5 +160,26 @@ export const deleteIMCRecord = async (recordId)=>{
     return false;
   }
 }
+
+// --- RESET PASSWORD --- //
+//1.URL para web - URL de redirecionamento após reset de senha  
+//2.URL para mobile - esquema de URL personalizado para redirecionamento
+const REDIRECT_URL = Platform.OS === 'web'   
+? window.location.origin + "/recuperar-senha" 
+: "exp://10.0.0.162:8081/recuperar-senha"; 
+  
+export const resetPassword = async(email) =>{
+  try{
+    const {error} = await supabase.auth.resetPasswordForEmail(
+      email.trim().toLowerCase(), {
+        redirectTo: REDIRECT_URL
+    });
+    if (error) throw error;
+    return {success: true, message: "Email de recuperação enviado. Verifique sua caixa de entrada."};
+  }catch(error){
+    return {success: false, message: "Erro ao enviar email de recuperação. Verifique o email e tente novamente."};
+  }
+}
+
 
 
